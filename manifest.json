@@ -1,0 +1,28 @@
+{
+  "name": "File Share Target",
+  "short_name": "File ST",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff",
+  "theme_color": "#111",
+  "icons": [
+    {
+      "src": "https://wicg.github.io/web-share-target/demos/images/icon-512.png",
+      "sizes": "512x512"
+    }
+  ],
+  "share_target": {
+    "action": "./",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "file",
+          "accept": ["*/*"]
+        }
+      ]
+    }
+  }
+}
