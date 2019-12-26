@@ -7,7 +7,7 @@ addEventListener('activate', () => {
 });
 
 addEventListener('fetch', (event) => {
-  if (event.request.method !== 'POST' || event.request.match(/auphonic/) !== null) return;
+  if (event.request.method !== 'POST' || event.request.url.match(/auphonic/) !== null) return;
   
   try {
     event.respondWith(Response.redirect('/pwa-audio-transcript/'));
