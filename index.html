@@ -24,6 +24,7 @@
     navigator.serviceWorker.register('sw.js');
 
     var productionTimeout = null;
+    var transcriptTimeout = null;
     var credentials = "thejoin:qbumUEjjVR2bicv";
     
     function displayImage(file) {
@@ -38,13 +39,15 @@
 
     function getTranscriptFile(url) {
       var xhr = new XMLHttpRequest();
-      xhr.onload=function(e) {
-        if(this.readyState === 4) {
+      xhr.onload = function(e) {
+        if(this.readyState === 4 && this.status == 200) {
+          clearInterval(transcriptTimeout);
+          console.log(e.target);
           var jsonResponse = JSON.parse(e.target.responseText);
-          alert(jsonResponse['text']);
+          alert(jsonResponse[0]['text']);
         }
       };
-      xhr.open("GET",url,true);
+      xhr.open("GET",'https://cors-anywhere.herokuapp.com/' + url,true);
       xhr.setRequestHeader("Authorization", "Basic " + btoa(credentials));
       xhr.send();
     }
@@ -58,7 +61,9 @@
             for(let key in jsonResponse['data']['output_files']) {
               if (jsonResponse['data']['output_files'][key]['format'] == 'speech' && jsonResponse['data']['output_files'][key]['download_url'] !== null) {
                 clearInterval(productionTimeout);
-                getTranscriptFile(jsonResponse['data']['output_files'][key]['download_url']);
+                transcriptTimeout = setInterval(function () {
+                  getTranscriptFile(jsonResponse['data']['output_files'][key]['download_url']);
+                }, 2000);
                 return true;
               }
             }
