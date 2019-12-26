@@ -6,16 +6,15 @@ addEventListener('activate', () => {
   clients.claim();
 });
 
-/*addEventListener('fetch', (event) => {
+addEventListener('fetch', (event) => {
   if (event.request.method !== 'POST') return;
   
-  event.respondWith(Response.redirect('/pwa-audio-transcript/'));
+  /*event.respondWith(Response.redirect('/pwa-audio-transcript/'));
   
   event.waitUntil(async function () {
     const data = await event.request.formData();
     const client = await self.clients.get(event.resultingClientId);
     const file = data.get('file');
     client.postMessage({ file });
-  }());
+  }());*/
 });
-*/
