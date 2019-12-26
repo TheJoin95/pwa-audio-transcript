@@ -1,6 +1,6 @@
 {
-  "name": "File Share Target",
-  "short_name": "File ST",
+  "name": "Audio transcripter",
+  "short_name": "Transcripter App",
   "start_url": "/pwa-audio-transcript/index.html",
   "display": "standalone",
   "orientation": "any",
@@ -8,7 +8,7 @@
   "theme_color": "#111",
   "icons": [
     {
-      "src": "https://wicg.github.io/web-share-target/demos/images/icon-512.png",
+      "src": "/pwa-audio-transcript/assets/icon.png",
       "sizes": "512x512"
     }
   ],

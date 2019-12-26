@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>Transcripter App</title>
+  <meta name="description" content="A free transcripter PWA for WhatsApp &amp; Telegram audio" />
   <meta charset="utf-8">
   <link rel="manifest" href="manifest.json">
   <meta name="viewport" content="width=device-width">
@@ -14,6 +16,56 @@
       display: block;
       max-width: 100%;
     }
+    #spinner {
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.76);
+      position: fixed;
+      z-index: 99999;
+      left: 0;
+      right:0;
+      margin-left:auto;
+      margin-right:auto;
+    }
+
+    #spinner p {
+      position: relative;
+      top: 40%;
+      font-size: 28px;
+      color: #0f6795;
+      width: 100%;
+      text-align: center;
+    }
+
+    .brandSlider .slick-initialized .slick-slide {
+      float: none;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .loader {
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #0f6795;
+      width: 120px;
+      height: 120px;
+      position: relative;
+      top: 35%;
+      /*left: 45%;*/
+      margin: auto;
+      -webkit-animation: spin 2s linear infinite;
+      animation: spin 2s linear infinite;
+    }
+
+    @-webkit-keyframes spin {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -23,31 +75,69 @@
   <script>
     navigator.serviceWorker.register('sw.js');
 
-    var productionTimeout = null;
-    var transcriptTimeout = null;
-    var credentials = "thejoin:qbumUEjjVR2bicv";
-    
-    function displayImage(file) {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-      img.onload = () => {
-        URL.revokeObjectURL(url);
-      };
-      img.src = url;
-      document.body.append(img);
-    }
+    var productionInterval = null;
+    var transcriptInterval = null;
+    var credentialList = [
+      {
+        credentials: "thejoin:qbumUEjjVR2bicv",
+        preset: "7QEfU3XriStwVNWdrHf984"
+      },
+      {
+        credentials: "test-lqfcd:test-lqfcd",
+        preset: "wGvhqD3L59AqUz6NdZJbuS"
+      },
+      {
+        credentials: "test-f4cks:test-f4cks",
+        preset: "P6fhcV8bHFYKQBQT9EVkgG"
+      }
+    ];
+
+    const randIndex = Math.floor(Math.random() * (credentialList.length));
+    const credentials = credentialList[randIndex]['credentials'];
+    const preset = credentialList[randIndex]['preset'];
+
+    const corsURL = 'https://cors-anywhere.herokuapp.com/';
+
+    var isInProgress = false;
+
+    function toggleSpinner () {
+      var text = 'Loading...';
+
+      // #spinner deve esistere per forza nel caso in cui lo si debba rimuovere
+      if(document.querySelector('#spinner') !== null) {
+        setTimeout(function() {document.body.removeChild(document.querySelector('#spinner'))}, 400);;
+      }else{
+        var loaderDiv = document.createElement('div');
+        loaderDiv.setAttribute('class', 'loader');
+
+        var pDiv = document.createElement('p');
+        pDiv.innerText = text;
+
+        var spinnerContainer = document.createElement('div');
+        spinnerContainer.setAttribute('id', 'spinner');
+
+        spinnerContainer.appendChild(loaderDiv);
+        spinnerContainer.appendChild(pDiv);
+        document.body.prepend(spinnerContainer);
+      }
+    };
 
     function getTranscriptFile(url) {
       var xhr = new XMLHttpRequest();
       xhr.onload = function(e) {
         if(this.readyState === 4 && this.status == 200) {
-          clearInterval(transcriptTimeout);
-          console.log(e.target);
+          clearInterval(transcriptInterval);
           var jsonResponse = JSON.parse(e.target.responseText);
-          alert(jsonResponse[0]['text']);
+          var str = '';
+          for (let key in jsonResponse) {
+            str += jsonResponse[key]['text'];
+          }
+          alert(str);
+          toggleSpinner();
+          isInProgress = false;
         }
       };
-      xhr.open("GET",'https://cors-anywhere.herokuapp.com/' + url,true);
+      xhr.open("GET", corsURL + url,true);
       xhr.setRequestHeader("Authorization", "Basic " + btoa(credentials));
       xhr.send();
     }
@@ -60,8 +150,8 @@
           if (jsonResponse['data']['output_files'] !== undefined) {
             for(let key in jsonResponse['data']['output_files']) {
               if (jsonResponse['data']['output_files'][key]['format'] == 'speech' && jsonResponse['data']['output_files'][key]['download_url'] !== null) {
-                clearInterval(productionTimeout);
-                transcriptTimeout = setInterval(function () {
+                clearInterval(productionInterval);
+                transcriptInterval = setInterval(function () {
                   getTranscriptFile(jsonResponse['data']['output_files'][key]['download_url']);
                 }, 2000);
                 return true;
@@ -70,16 +160,18 @@
           }
         }
       };
-      xhr.open("GET","https://cors-anywhere.herokuapp.com/https://auphonic.com/api/production/" + uuid + ".json",true);
+      xhr.open("GET", corsURL + "https://auphonic.com/api/production/" + uuid + ".json",true);
       xhr.setRequestHeader("Authorization", "Basic " + btoa(credentials));
       xhr.send();
     }
     
     function displayFile(file) {
+      isInProgress = true;
+      toggleSpinner();
       const ul = document.createElement('ul');
       document.body.append(ul);
 
-      for (const prop of ['name', 'size', 'type']) {
+      for (const prop of ['name']) {
         const li = document.createElement('li');
         li.textContent = `${prop} = ${file[prop]}`;
         ul.append(li);
@@ -87,20 +179,26 @@
 
       var frmData = new FormData();
       frmData.append('input_file', file);
-      frmData.append('preset', '7QEfU3XriStwVNWdrHf984');
+      frmData.append('preset', preset);
       frmData.append('title', 'transcript - ' + ((new Date()).getTime()));
       frmData.append('action', 'start');
 
       var xhr = new XMLHttpRequest();
-      xhr.onload=function(e) {
+      xhr.onerror = function (e) {
+        clearInterval(productionInterval);
+        toggleSpinner();
+        isInProgress = false;
+        console.log(e);
+      }
+      xhr.onload = function(e) {
         if(this.readyState === 4) {
           var jsonResponse = JSON.parse(e.target.responseText);
-          productionTimeout = setInterval(function () {
+          productionInterval = setInterval(function () {
             getProductionFile(jsonResponse['data']['uuid']);
           }, 2500);
         }
       };
-      xhr.open("POST","https://cors-anywhere.herokuapp.com/https://auphonic.com/api/simple/productions.json",true);
+      xhr.open("POST", corsURL + "https://auphonic.com/api/simple/productions.json",true);
       xhr.setRequestHeader("Authorization", "Basic " + btoa(credentials));
       xhr.send(frmData);
     }
