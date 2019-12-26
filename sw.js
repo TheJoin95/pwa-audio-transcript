@@ -7,7 +7,7 @@ addEventListener('activate', () => {
 });
 
 addEventListener('fetch', (event) => {
-  if (event.request.method !== 'POST') return;
+  // if (event.request.method !== 'POST') return;
   
   try {
     //event.respondWith(Response.redirect('/'));
