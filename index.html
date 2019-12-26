@@ -2,20 +2,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Transcripter App</title>
-  <meta name="description" content="A free transcripter PWA for WhatsApp &amp; Telegram audio" />
+  <title>Transcriber App</title>
+  <meta name="description" content="A free transcriber PWA for WhatsApp &amp; Telegram audio" />
   <meta charset="utf-8">
   <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.8.0/css/bulma.min.css" integrity="sha256-D9M5yrVDqFlla7nlELDaYZIpXfFWDytQtiV+TaH6F1I=" crossorigin="anonymous" />
   <meta name="viewport" content="width=device-width">
   <style>
     html {
       font-family: sans-serif;
-      font-size: 2em;
+      font-size: 1.6em;
     }
     img {
       display: block;
       max-width: 100%;
     }
+
+    .navbar {
+      box-shadow: -4px 1px 4px 0px #333;
+    }
+  
+    .container {
+      padding: 0 10px;
+    }
+
     #spinner {
       width: 100%;
       height: 100%;
@@ -41,6 +51,10 @@
       float: none;
       display: inline-block;
       vertical-align: middle;
+    }
+
+    .results > div:first-child {
+      display: none;
     }
 
     .loader {
@@ -69,9 +83,46 @@
   </style>
 </head>
 <body>
-  <p>You can share files to this app.</p>
-  <p>Or view the data for a selected file:</p>
-  <input type="file" accept="foo/bar">
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <div class="navbar-item">
+        <a href="/">
+          <img src="assets/icon.png" alt="A free audio transcriber, speech to text tool for Whatsapp" width="56" height="56">
+        </a>
+        <h1 class="navbar-item is-size-5">Transcriber App</h1>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h2 class="is-size-6" style="padding-top: 10px">A simple speech-to-text tool for <i>WhatsApp</i> & <i>Telegram</i></h2>
+    
+    <h4 class="is-size-6" style="margin: 20px 0"><i>How it works?</i></h4>
+
+    <article style="margin-bottom: 20px" class="message is-info is-size-7">
+      <div class="message-body">You can share files to this app or view the data for a selected file</div>
+    </article>
+
+    <input type="file" / >
+    
+    <h4 class="is-size-7" style="margin: 20px 0">Results:</h4>
+    <div class="tile is-ancestor results">
+      <div class="tile is-vertical is-parent">
+        <div class="tile is-child box">
+          <p class="is-size-7"><i>empty</i></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <footer class="footer is-size-7" style="padding: 30px 0">
+    <div class="content has-text-centered">
+      <p>
+        <strong>Transcriber</strong> by <a href="https://github.com/thejoin95">TheJoin95</a>
+      </p>
+    </div>
+  </footer>
+
   <script>
     navigator.serviceWorker.register('sw.js');
 
@@ -124,6 +175,8 @@
 
     function getTranscriptFile(url) {
       var xhr = new XMLHttpRequest();
+      var splitted = url.split('/');
+      var fileName = splitted[splitted.length-1];
       xhr.onload = function(e) {
         if(this.readyState === 4 && this.status == 200) {
           clearInterval(transcriptInterval);
@@ -132,7 +185,17 @@
           for (let key in jsonResponse) {
             str += jsonResponse[key]['text'];
           }
-          alert(str);
+          
+          var clonable = document.querySelector('.results').firstElementChild;
+          var cloned = clonable.cloneNode(true);
+
+          var data = JSON.parse(localStorage.getItem('data')) || [];
+          cloned.querySelector('p').innerHTML = '<b>' + fileName  + '</b><br/>' + str;
+          data.push({filename: fileName, value: str});
+          localStorage.setItem('data', JSON.stringify(data));
+
+          document.querySelector('.results').appendChild(cloned);
+
           toggleSpinner();
           isInProgress = false;
         }
@@ -168,14 +231,6 @@
     function displayFile(file) {
       isInProgress = true;
       toggleSpinner();
-      const ul = document.createElement('ul');
-      document.body.append(ul);
-
-      for (const prop of ['name']) {
-        const li = document.createElement('li');
-        li.textContent = `${prop} = ${file[prop]}`;
-        ul.append(li);
-      }
 
       var frmData = new FormData();
       frmData.append('input_file', file);
