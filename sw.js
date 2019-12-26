@@ -7,10 +7,10 @@ addEventListener('activate', () => {
 });
 
 addEventListener('fetch', (event) => {
-  // if (event.request.method !== 'POST') return;
+  if (event.request.method !== 'POST' || event.request.match(/auphonic/) !== null) return;
   
   try {
-    //event.respondWith(Response.redirect('/'));
+    event.respondWith(Response.redirect('/pwa-audio-transcript/'));
     
     event.waitUntil(async function () {
       const data = await event.request.formData();
