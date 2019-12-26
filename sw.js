@@ -6,10 +6,10 @@ addEventListener('activate', () => {
   clients.claim();
 });
 
-/*addEventListener('fetch', (event) => {
+addEventListener('fetch', (event) => {
   if (event.request.method !== 'POST') return;
   
-  event.respondWith(Response.redirect('./'));
+  event.respondWith(Response.redirect('/pwa-audio-transcript/'));
   
   event.waitUntil(async function () {
     const data = await event.request.formData();
@@ -17,4 +17,4 @@ addEventListener('activate', () => {
     const file = data.get('file');
     client.postMessage({ file });
   }());
-});*/
+});
