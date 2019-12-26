@@ -1,7 +1,7 @@
 {
   "name": "File Share Target",
   "short_name": "File ST",
-  "start_url": "/pwa-audio-transcript/",
+  "start_url": "/pwa-audio-transcript/index.html",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#fff",
