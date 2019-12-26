@@ -13,7 +13,9 @@ addEventListener('fetch', (event) => {
   
   event.waitUntil(async function () {
     const data = await event.request.formData();
+    console.re.log(event);
     const client = await self.clients.get(event.resultingClientId);
+    console.re.log(client);
     const file = data.get('file');
     client.postMessage({ file });
   }());
