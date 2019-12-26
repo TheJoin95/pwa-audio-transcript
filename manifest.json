@@ -1,7 +1,7 @@
 {
   "name": "File Share Target",
   "short_name": "File ST",
-  "start_url": "./",
+  "start_url": "/pwa-audio-transcript/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#fff",
@@ -13,7 +13,7 @@
     }
   ],
   "share_target": {
-    "action": "./",
+    "action": "/pwa-audio-transcript/",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
