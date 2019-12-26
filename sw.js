@@ -10,7 +10,7 @@ addEventListener('fetch', (event) => {
   if (event.request.method !== 'POST') return;
   
   try {
-    event.respondWith(Response.redirect('/pwa-audio-transcript/'));
+    //event.respondWith(Response.redirect('/'));
     
     event.waitUntil(async function () {
       const data = await event.request.formData();
