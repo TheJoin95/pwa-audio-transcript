@@ -70,7 +70,7 @@
           }
         }
       };
-      xhr.open("GET","https://auphonic.com/api/production/" + uuid + ".json",true);
+      xhr.open("GET","https://cors-anywhere.herokuapp.com/https://auphonic.com/api/production/" + uuid + ".json",true);
       xhr.setRequestHeader("Authorization", "Basic " + btoa(credentials));
       xhr.send();
     }
@@ -100,7 +100,7 @@
           }, 2500);
         }
       };
-      xhr.open("POST","https://auphonic.com/api/simple/productions.json",true);
+      xhr.open("POST","https://cors-anywhere.herokuapp.com/https://auphonic.com/api/simple/productions.json",true);
       xhr.setRequestHeader("Authorization", "Basic " + btoa(credentials));
       xhr.send(frmData);
     }
