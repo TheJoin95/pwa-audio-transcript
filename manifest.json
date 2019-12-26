@@ -1,6 +1,6 @@
 {
-  "name": "Audio transcripter",
-  "short_name": "Transcripter App",
+  "name": "Audio transcriber",
+  "short_name": "Transcriber App",
   "start_url": "/pwa-audio-transcript/index.html",
   "display": "standalone",
   "orientation": "any",
