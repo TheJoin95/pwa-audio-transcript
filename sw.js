@@ -6,7 +6,7 @@ addEventListener('activate', () => {
   clients.claim();
 });
 
-addEventListener('fetch', (event) => {
+/*addEventListener('fetch', (event) => {
   if (event.request.method !== 'POST') return;
   
   event.respondWith(Response.redirect('./'));
@@ -17,4 +17,4 @@ addEventListener('fetch', (event) => {
     const file = data.get('file');
     client.postMessage({ file });
   }());
-});
+});*/
